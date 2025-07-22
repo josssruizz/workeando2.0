@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workeando - Dashboard Empleador</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    
+    <!-- AOS.js -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Flowbite -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+    
+    <style>
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+        
+        .status-pendiente { background-color: #fef3c7; color: #92400e; }
+        .status-aceptado { background-color: #d1fae5; color: #065f46; }
+        .status-rechazado { background-color: #fee2e2; color: #991b1b; }
+        .status-pagado { background-color: #d1fae5; color: #065f46; }
+        .status-pendiente-pago { background-color: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-lg fixed w-full top-0 z-50 animate__animated animate__fadeInDown">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-blue-600">Workeando</h1>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="flex items-center space-x-4">
+                    <!-- Profile Button -->
+                    <!-- Profile Link -->
+<a th:href="@{'/perfil/empleador/' + ${usuarioId}}" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+    <i data-lucide="user" class="w-4 h-4"></i>
+    <span>Mi Perfil</span>
+</a>
+
+                    
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button id="notificationBtn" class="relative p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center notification-badge">3</span>
+                        </button>
+                        
+                        <!-- Notifications Dropdown -->
+                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                            <div class="p-4 border-b border-gray-200">
+                                <h3 class="text-lg font-semibold text-gray-900">Notificaciones</h3>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
+                                    <div class="flex items-start space-x-3">
+                                        <i data-lucide="user-plus" class="w-5 h-5 text-blue-500 mt-1"></i>
+                                        <div>
+                                            <p class="text-sm text-gray-900">Nueva postulación recibida</p>
+                                            <p class="text-xs text-gray-500">Juan Pérez se postuló a "Desarrollo Web"</p>
+                                            <p class="text-xs text-gray-400">Hace 2 horas</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
+                                    <div class="flex items-start space-x-3">
+                                        <i data-lucide="package" class="w-5 h-5 text-green-500 mt-1"></i>
+                                        <div>
+                                            <p class="text-sm text-gray-900">Entrega completada</p>
+                                            <p class="text-xs text-gray-500">María García completó "Diseño Logo"</p>
+                                            <p class="text-xs text-gray-400">Hace 1 día</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-3 hover:bg-gray-50">
+                                    <div class="flex items-start space-x-3">
+                                        <i data-lucide="message-circle" class="w-5 h-5 text-purple-500 mt-1"></i>
+                                        <div>
+                                            <p class="text-sm text-gray-900">Nuevo mensaje</p>
+                                            <p class="text-xs text-gray-500">Carlos López envió un mensaje</p>
+                                            <p class="text-xs text-gray-400">Hace 3 días</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Logout Button -->
+                    <a href="/logout" class="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20 pb-12 flex-grow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Welcome Section -->
+            <div class="mb-8" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Dashboard del Empleador</h2>
+                <p class="text-gray-600">Gestiona tus proyectos y encuentra el talento perfecto</p>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="mb-8" data-aos="fade-up" data-aos-delay="100">
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-8">
+                        <button id="tab-proyectos" class="tab-button active border-b-2 border-blue-500 py-2 px-1 text-sm font-medium text-blue-600">
+                            <i data-lucide="briefcase" class="w-4 h-4 inline mr-2"></i>
+                            Mis Proyectos
+                        </button>
+                        <button id="tab-postulantes" class="tab-button border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            <i data-lucide="users" class="w-4 h-4 inline mr-2"></i>
+                            Postulantes Recientes
+                        </button>
+                        <button id="tab-gestion" class="tab-button border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            <i data-lucide="layers" class="w-4 h-4 inline mr-2"></i>
+                            Gestión de Proyectos
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="tab-content">
+                <!-- Mis Proyectos Tab -->
+                <div id="content-proyectos" class="tab-content">
+                    <div class="flex justify-between items-center mb-6" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-xl font-semibold text-gray-900">Mis Proyectos</h3>
+                        <button id="createProjectBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            Crear Proyecto
+                        </button>
+                    </div>
+
+                    <!-- Filtro por Categoría -->
+                    <div class="mb-6">
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <div class="flex flex-wrap items-center gap-4">
+                                <div class="flex items-center space-x-2">
+                                    <label for="categoriaFilterProyectos" class="text-sm font-medium text-gray-700">Filtrar por categoría:</label>
+                                    <select id="categoriaFilterProyectos" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="">Todas las categorías</option>
+                                        <option th:each="categoria : ${categorias}" 
+                                                th:value="${categoria.id}" 
+                                                th:text="${categoria.nombre}"
+                                                th:selected="${categoriaId != null && categoriaId == categoria.id}">
+                                            Categoría
+                                        </option>
+                                    </select>
+                                </div>
+                                <button id="aplicarFiltroProyectos" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                                    <i data-lucide="filter" class="w-4 h-4 inline mr-1"></i>
+                                    Aplicar Filtro
+                                </button>
+                                <button id="limpiarFiltroProyectos" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                                    <i data-lucide="x" class="w-4 h-4 inline mr-1"></i>
+                                    Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Projects Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" th:if="${proyectos}">
+                        <div th:each="proyecto, iterStat : ${proyectos}" class="bg-white rounded-lg shadow-md p-4 project-card animate__animated animate__fadeInUp border border-gray-200 hover:border-blue-300" th:style="'animation-delay:' + ${iterStat.index * 100} + 'ms'">
+                            <!-- Header del proyecto -->
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2" th:text="${proyecto.titulo}">Título del proyecto</h4>
+                                    <div class="flex flex-wrap gap-1 mb-2">
+                                        <!-- Categoría -->
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800" th:if="${proyecto.categoriaNombre}" th:text="${proyecto.categoriaNombre}">
+                                            Categoría
+                                        </span>
+                                        <!-- Modalidad -->
+                                        <th:block th:switch="${proyecto.modalidad}">
+                                            <span th:case="'VIRTUAL'" class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <i data-lucide="monitor" class="w-3 h-3 mr-1"></i>
+                                                Virtual
+                                            </span>
+                                            <span th:case="'PRESENCIAL'" class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <i data-lucide="map-pin" class="w-3 h-3 mr-1"></i>
+                                                Presencial
+                                            </span>
+                                            <span th:case="'HIBRIDO'" class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                <i data-lucide="shuffle" class="w-3 h-3 mr-1"></i>
+                                                Híbrido
+                                            </span>
+                                        </th:block>
+                                        <span th:if="${proyecto.modalidadPago}" class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            <i data-lucide="credit-card" class="w-3 h-3 mr-1"></i>
+                                            <span th:text="${proyecto.modalidadPagoFormateada}">Modalidad Pago</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Presupuesto destacado -->
+                                <div class="text-right ml-2">
+                                    <div class="text-xl font-bold text-green-600" th:text="'S/.' + ${proyecto.montoPropuesto}">S/.200</div>
+                                    <div class="text-xs text-gray-500">Presupuesto</div>
+                                </div>
+                            </div>
+
+                            <!-- Descripción -->
+                            <p class="text-gray-600 text-sm mb-3 line-clamp-2" th:text="${proyecto.descripcion}">Descripción del proyecto</p>
+
+                            <!-- Información adicional -->
+                            <div class="space-y-1 mb-3 text-xs text-gray-600">
+                                <!-- Postulantes -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i data-lucide="users" class="w-3 h-3 mr-1 text-gray-400"></i>
+                                        <span>Postulantes:</span>
+                                    </div>
+                                    <span class="font-semibold text-blue-600" th:text="${proyecto.postulaciones != null ? #lists.size(proyecto.postulaciones) : 0}">0</span>
+                                </div>
+
+                                <!-- Fecha de inicio -->
+                                <div th:if="${proyecto.fechaInicio}" class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i data-lucide="calendar" class="w-3 h-3 mr-1 text-gray-400"></i>
+                                        <span>Inicio:</span>
+                                    </div>
+                                    <span th:text="${proyecto.fechaInicioFormateada}">01/01/2025</span>
+                                </div>
+
+                                <!-- Ubicación -->
+                                <div th:if="${proyecto.ubicacion}" class="flex items-center">
+                                    <i data-lucide="map-pin" class="w-3 h-3 mr-1 text-gray-400"></i>
+                                    <span class="truncate" th:text="${proyecto.ubicacion}">Ubicación</span>
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="flex gap-2 pt-3 border-t border-gray-200 justify-center">
+                                <button type="button" class="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded text-xs font-medium transition-colors flex items-center justify-center"
+                                    th:onclick="'abrirModalDetalles(' + ${proyecto.id} + ')'">
+                                    <i data-lucide="eye" class="w-3 h-3 mr-1"></i>
+                                    Ver Detalles
+                                </button>
+                                <a th:href="@{'/empleador'(tab='postulantes', proyectoId=${proyecto.id})}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-xs font-medium transition-colors flex items-center justify-center">
+                                    <i data-lucide="users" class="w-3 h-3 mr-1"></i>
+                                    Ver Postulantes
+                                </a>
+                                <form th:action="@{'/empleador/proyectos/' + ${proyecto.id} + '/cerrar'}" method="post" class="inline">
+                                    <button type="submit" onclick="return confirm('¿Estás seguro de cerrar este proyecto? Esta acción no se puede deshacer.');" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-xs font-medium transition-colors">
+                                        <i data-lucide="x" class="w-3 h-3"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+        <!-- Paginación para Proyectos -->
+        <div class="mt-8 flex justify-center">
+            <div th:if="${proyectosTotalPages != null and proyectosTotalPages > 1}">
+                <nav class="flex items-center space-x-2">
+                    <!-- Botón Anterior -->
+                    <a th:if="${proyectosCurrentPage > 0}" 
+                       th:href="@{/empleador(proyectosPage=${proyectosCurrentPage - 1}, postulacionesPage=${postulacionesCurrentPage}, tab='proyectos', categoriaId=${categoriaId})}"
+                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </a>
+                    
+                    <!-- Números de página -->
+                    <span th:each="i : ${#numbers.sequence(0, proyectosTotalPages - 1)}" th:if="${proyectosTotalPages <= 10 or (i >= proyectosCurrentPage - 2 and i <= proyectosCurrentPage + 2)}">
+                        <a th:if="${i != proyectosCurrentPage}" 
+                           th:href="@{/empleador(proyectosPage=${i}, postulacionesPage=${postulacionesCurrentPage}, tab='proyectos', categoriaId=${categoriaId})}"
+                           th:text="${i + 1}"
+                           class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        </a>
+                        <span th:if="${i == proyectosCurrentPage}" 
+                              th:text="${i + 1}"
+                              class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">
+                        </span>
+                    </span>
+                    
+                    <!-- Botón Siguiente -->
+                    <a th:if="${proyectosCurrentPage < proyectosTotalPages - 1}" 
+                       th:href="@{/empleador(proyectosPage=${proyectosCurrentPage + 1}, postulacionesPage=${postulacionesCurrentPage}, tab='proyectos', categoriaId=${categoriaId})}"
+                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </a>
+                </nav>
+            </div>
+            <!-- Mostrar información cuando no hay paginación -->
+            <div th:if="${proyectosTotalPages == null or proyectosTotalPages <= 1}" class="text-sm text-gray-500">
+                <span th:if="${proyectos != null and #lists.size(proyectos) > 0}">
+                    Mostrando [[${#lists.size(proyectos)}]] proyecto(s)
+                </span>
+                <span th:if="${proyectos == null or #lists.size(proyectos) == 0}">
+                    No hay proyectos para mostrar
+                </span>
+            </div>
+        </div>
+                </div>
+
+                <!-- Postulantes Recientes Tab -->
+                <div id="content-postulantes" class="tab-content hidden">
+                    <div class="mb-6" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Postulantes Recientes</h3>
+
+                        <!-- Indicador de filtro por proyecto -->
+                        <div th:if="${proyectoSeleccionado != null}" class="mb-4">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i data-lucide="filter" class="w-5 h-5 text-blue-600 mr-2"></i>
+                                        <div>
+                                            <p class="text-sm font-medium text-blue-900">Mostrando postulantes del proyecto:</p>
+                                            <p class="text-lg font-semibold text-blue-800" th:text="${proyectoSeleccionado.titulo}">Título del proyecto</p>
+                                        </div>
+                                    </div>
+                                    <a th:href="@{'/empleador'(tab='postulantes')}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                                        <i data-lucide="x" class="w-4 h-4 inline mr-1"></i>
+                                        Ver Todos
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filtro por Categoría -->
+                        <div class="mb-4" th:if="${proyectoSeleccionado == null}">
+                            <div class="bg-white rounded-lg shadow-md p-4">
+                                <div class="flex flex-wrap items-center gap-4">
+                                    <div class="flex items-center space-x-2">
+                        <label for="categoriaFilter" class="text-sm font-medium text-gray-700">Filtrar por categoría:</label>
+                        <select id="categoriaFilter" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Todas las categorías</option>
+                            <option th:each="categoria : ${categorias}" 
+                                    th:value="${categoria.id}" 
+                                    th:text="${categoria.nombre}"
+                                    th:selected="${categoriaIdPostulaciones != null && categoriaIdPostulaciones == categoria.id}">
+                                Categoría
+                            </option>
+                        </select>
+                    </div>
+                    <button id="aplicarFiltro" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i data-lucide="filter" class="w-4 h-4 inline mr-1"></i>
+                        Aplicar Filtro
+                    </button>
+                    <button id="limpiarFiltro" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i data-lucide="x" class="w-4 h-4 inline mr-1"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+                        <!-- Applicants Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" th:if="${postulaciones}">
+                            <div th:each="postulacion : ${postulaciones}" class="bg-white rounded-lg shadow-md p-4 project-card animate__animated animate__fadeInUp border border-gray-200 hover:border-blue-300">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3">
+                                        <i data-lucide="user" class="w-5 h-5 text-gray-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900" th:text="${postulacion.freelancerNombre}">Nombre Freelancer</p>
+                                        <p class="text-xs text-gray-500" th:text="${postulacion.proyecto.titulo}">Proyecto</p>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="text-green-600 font-semibold text-sm" th:text="'S/.' + ${postulacion.montoContraoferta}">S/.1000</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="status-badge"
+                                          th:classappend="${postulacion.estado == 'PENDIENTE' ? ' status-pendiente' : postulacion.estado == 'ACEPTADO' ? ' status-aceptado' : postulacion.estado == 'RECHAZADO' ? ' status-rechazado' : ''}"
+                                          th:text="${postulacion.estado}">Estado</span>
+                                </div>
+                                <div class="mb-3 text-xs text-gray-500" th:text="${postulacion.fechaPostulacionFormateada}">01/01/2025</div>
+                                <div class="flex space-x-2">
+                                    <a th:if="${postulacion.estado == 'PENDIENTE'}" th:href="@{'/empleador/postulaciones/' + ${postulacion.id} + '/aceptar'}" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs transition-colors text-center">Aceptar</a>
+                                    <a th:if="${postulacion.estado == 'PENDIENTE'}" th:href="@{'/empleador/postulaciones/' + ${postulacion.id} + '/rechazar'}" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs transition-colors text-center">Rechazar</a>
+                                    <span th:if="${postulacion.estado != 'PENDIENTE'}" class="text-gray-400 text-xs flex-1 text-center">Sin acciones</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paginación para Postulaciones -->
+                        <div class="mt-8 flex justify-center">
+                            <div th:if="${postulacionesTotalPages != null and postulacionesTotalPages > 1}">
+                                <nav class="flex items-center space-x-2">
+                                    <!-- Botón Anterior -->
+                                    <a th:if="${postulacionesCurrentPage > 0}" 
+                                       th:href="@{/empleador(postulacionesPage=${postulacionesCurrentPage - 1}, proyectosPage=${proyectosCurrentPage}, tab='postulantes')}"
+                                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                    </a>
+                                    
+                                    <!-- Números de página -->
+                                    <span th:each="i : ${#numbers.sequence(0, postulacionesTotalPages - 1)}" th:if="${postulacionesTotalPages <= 10 or (i >= postulacionesCurrentPage - 2 and i <= postulacionesCurrentPage + 2)}">
+                                        <a th:if="${i != postulacionesCurrentPage}" 
+                                           th:href="@{/empleador(postulacionesPage=${i}, proyectosPage=${proyectosCurrentPage}, tab='postulantes')}"
+                                           th:text="${i + 1}"
+                                           class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                        </a>
+                                        <span th:if="${i == postulacionesCurrentPage}" 
+                                              th:text="${i + 1}"
+                                              class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">
+                                        </span>
+                                    </span>
+                                    
+                                    <!-- Botón Siguiente -->
+                                    <a th:if="${postulacionesCurrentPage < postulacionesTotalPages - 1}" 
+                                       th:href="@{/empleador(postulacionesPage=${postulacionesCurrentPage + 1}, proyectosPage=${proyectosCurrentPage}, tab='postulantes')}"
+                                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                    </a>
+                                </nav>
+                            </div>
+                            <!-- Mostrar información cuando no hay paginación -->
+                            <div th:if="${postulacionesTotalPages == null or postulacionesTotalPages <= 1}" class="text-sm text-gray-500">
+                                <span th:if="${postulaciones != null and #lists.size(postulaciones) > 0}">
+                                    Mostrando [[${#lists.size(postulaciones)}]] postulación(es)
+                                </span>
+                                <span th:if="${postulaciones == null or #lists.size(postulaciones) == 0}">
+                                    No hay postulaciones para mostrar
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gestion Tab -->
+                <div id="content-gestion" class="tab-content hidden">
+                    <div class="mb-6" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Proyectos en Gestión</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" th:if="${proyectosGestion != null and #lists.size(proyectosGestion) > 0}">
+                        <div th:each="proyecto : ${proyectosGestion}" class="bg-white rounded-lg shadow-md p-6 project-card animate__animated animate__fadeInUp border-l-4 border-green-500">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-2" th:text="${proyecto.titulo}">Título del proyecto</h3>
+                                    <p class="text-sm text-gray-600">Freelancer: <span class="font-semibold" th:text="${proyecto.freelancerContratadoNombre}"></span></p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-green-600" th:text="'S/.' + ${proyecto.montoPropuesto}">S/.200</div>
+                                    <div class="text-sm text-gray-500">Monto Acordado</div>
+                                </div>
+                            </div>
+
+                            <p class="text-gray-700 mb-4 line-clamp-3" th:text="${proyecto.descripcion}">Descripción del proyecto</p>
+
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i data-lucide="mail" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                    <span>Contacto Freelancer: <span class="font-medium" th:text="${proyecto.freelancerContratadoCorreo}"></span></span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i data-lucide="phone" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                    <span>Teléfono Freelancer: <span class="font-medium" th:text="${proyecto.freelancerContratadoTelefono ?: 'N/A'}"></span></span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i data-lucide="dollar-sign" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                    <span>Estado de Pago: 
+                                        <span th:if="${proyecto.pagado}" class="status-badge status-pagado">PAGADO</span>
+                                        <span th:unless="${proyecto.pagado}" class="status-badge status-pendiente-pago">PENDIENTE</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 pt-4 border-t border-gray-200">
+                                <button type="button" class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
+                                    th:onclick="'abrirModalDetalles(' + ${proyecto.id} + ')'">
+                                    <i data-lucide="eye" class="w-4 h-4 mr-2"></i>
+                                    Ver Detalles
+                                </button>
+                                <button type="button" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                                    th:unless="${proyecto.pagado}" th:onclick="'confirmarPago(' + ${proyecto.id} + ')'">
+                                    <i data-lucide="credit-card" class="w-4 h-4 mr-2"></i>
+                                    Generar Pago
+                                </button>
+                                <button type="button" class="flex-1 bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors flex items-center justify-center"
+                                    th:unless="${proyecto.calificadoEmpleador}" th:onclick="'confirmarCalificacion(' + ${proyecto.id} + ', \'EMPLEADOR\')'">
+                                    <i data-lucide="star" class="w-4 h-4 mr-2"></i>
+                                    Calificar Freelancer
+                                </button>
+                                <span th:if="${proyecto.calificadoEmpleador}" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
+                                    Calificado
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paginación para Proyectos en Gestión -->
+                    <div th:if="${gestionTotalPages > 1}" class="mt-8 flex justify-center">
+                        <nav class="flex items-center space-x-2">
+                            <!-- Botón Anterior -->
+                            <a th:if="${gestionCurrentPage > 0}"
+                               th:href="@{/empleador(gestionPage=${gestionCurrentPage - 1}, proyectosPage=${proyectosCurrentPage}, postulacionesPage=${postulacionesCurrentPage}, tab='gestion')}"
+                               class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            </a>
+
+                            <!-- Números de página -->
+                            <span th:each="i : ${#numbers.sequence(0, gestionTotalPages - 1)}"
+                                  th:if="${gestionTotalPages <= 10 or (i >= gestionCurrentPage - 2 and i <= gestionCurrentPage + 2)}">
+                                <a th:if="${i != gestionCurrentPage}"
+                                   th:href="@{/empleador(gestionPage=${i}, proyectosPage=${proyectosCurrentPage}, postulacionesPage=${postulacionesCurrentPage}, tab='gestion')}"
+                                   th:text="${i + 1}"
+                                   class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                </a>
+                                <span th:if="${i == gestionCurrentPage}" th:text="${i + 1}"
+                                      class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">
+                                </span>
+                            </span>
+
+                            <!-- Botón Siguiente -->
+                            <a th:if="${gestionCurrentPage < gestionTotalPages - 1}"
+                               th:href="@{/empleador(gestionPage=${gestionCurrentPage + 1}, proyectosPage=${proyectosCurrentPage}, postulacionesPage=${postulacionesCurrentPage}, tab='gestion')}"
+                               class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </a>
+                        </nav>
+                    </div>
+                    <div th:if="${proyectosGestion == null or #lists.size(proyectosGestion) == 0}" class="text-center py-12">
+                        <i data-lucide="folder" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No tienes proyectos en gestión</h3>
+                        <p class="text-gray-500">Cuando aceptes postulantes, podrás gestionar tus proyectos aquí.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-auto" data-aos="fade-up">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- About -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Acerca de Workeando</h3>
+                    <p class="text-gray-400 text-sm">La plataforma líder en freelancing que conecta talento con oportunidades.</p>
+                </div>
+                
+                <!-- Links -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Enlaces</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Inicio</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Publicar Proyecto</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Términos y Condiciones</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Soporte</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contacto</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                            <span class="text-gray-400">contacto@workeando.com</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="phone" class="w-4 h-4"></i>
+                            <span class="text-gray-400">+1 (555) 123-4567</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Media -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Síguenos</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="linkedin" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">&copy; 2025 Workeando. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL HTML PARA CREAR PROYECTO CON VALIDACIONES -->
+    <div id="modalCrearProyecto" class="fixed inset-0 bg-gray-800 bg-opacity-50 hidden z-50 items-center justify-center">
+    <div class="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg relative">
+        <h2 class="text-xl font-bold mb-4">Crear Nuevo Proyecto</h2>
+        <form id="formCrearProyecto" method="post" th:action="@{/empleador/proyectos}" th:object="${proyectoDTO}" class="space-y-4">
+
+        <div>
+            <input type="text" th:field="*{titulo}" placeholder="Título del proyecto" maxlength="150" required class="w-full border px-4 py-2 rounded" />
+            <p class="text-red-600 text-sm mt-1" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></p>
+        </div>
+
+        <div>
+            <textarea th:field="*{descripcion}" placeholder="Descripción del proyecto" required class="w-full border px-4 py-2 rounded"></textarea>
+            <p class="text-red-600 text-sm mt-1" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></p>
+        </div>
+
+        <div>
+            <input type="number" th:field="*{montoPropuesto}" placeholder="Presupuesto (PEN)" min="10" required class="w-full border px-4 py-2 rounded" />
+            <p class="text-red-600 text-sm mt-1" th:if="${#fields.hasErrors('montoPropuesto')}" th:errors="*{montoPropuesto}"></p>
+        </div>
+
+        <div>
+            <select th:field="*{modalidad}" required class="w-full border px-4 py-2 rounded">
+            <option value="">Seleccionar modalidad</option>
+            <option value="VIRTUAL">Virtual</option>
+            <option value="PRESENCIAL">Presencial</option>
+            <option value="HIBRIDO">Híbrido</option>
+            </select>
+            <p class="text-red-600 text-sm mt-1" th:if="${#fields.hasErrors('modalidad')}" th:errors="*{modalidad}"></p>
+        </div>
+
+        <div>
+            <select th:field="*{categoriaId}" required class="w-full border px-4 py-2 rounded">
+            <option value="">Seleccionar categoría</option>
+            <option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}"></option>
+            </select>
+            <p class="text-red-600 text-sm mt-1" th:if="${#fields.hasErrors('categoriaId')}" th:errors="*{categoriaId}"></p>
+        </div>
+
+        <div>
+            <input type="text" th:field="*{ubicacion}" placeholder="Ubicación (opcional)" class="w-full border px-4 py-2 rounded" />
+            <p class="text-red-600 text-sm mt-1" th:if="${#fields.hasErrors('ubicacion')}" th:errors="*{ubicacion}"></p>
+        </div>
+
+        <div>
+            <select th:field="*{modalidadPago}" class="w-full border px-4 py-2 rounded">
+            <option value="">Seleccionar modalidad de pago</option>
+            <option value="POR_HORAS">Por Horas</option>
+            <option value="FIJO">Pago Fijo</option>
+            <option value="POR_PROYECTO">Por Proyecto</option>
+            </select>
+            <p class="text-red-600 text-sm mt-1" th:if="${#fields.hasErrors('modalidadPago')}" th:errors="*{modalidadPago}"></p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+            <label class="block text-sm text-gray-700 mb-1">Fecha de Inicio</label>
+            <input type="date" th:field="*{fechaInicio}" class="w-full border px-3 py-2 rounded" />
+            </div>
+            <div>
+            <label class="block text-sm text-gray-700 mb-1">Fecha Final</label>
+            <input type="date" th:field="*{fechaFinal}" class="w-full border px-3 py-2 rounded" />
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-3 mt-6">
+            <button type="button" onclick="toggleCrearProyectoModal(false)" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Crear Proyecto</button>
+        </div>
+        </form>
+    </div>
+    </div>
+
+
+<script th:inline="javascript">
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+
+    // Modal toggle for Crear Proyecto
+    function toggleCrearProyectoModal(show = true) {
+        const modal = document.getElementById('modalCrearProyecto');
+        if (modal) {
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+    }
+
+    // Initialize tabs
+    function initTabs() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.id.replace('tab-', 'content-');
+                const tabName = button.id.replace('tab-', '');
+
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                });
+                tabContents.forEach(content => content.classList.add('hidden'));
+
+                button.classList.add('active', 'border-blue-500', 'text-blue-600');
+                button.classList.remove('border-transparent', 'text-gray-500');
+                document.getElementById(targetTab).classList.remove('hidden');
+
+                // Actualizar URL con el parámetro de pestaña activa
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tabName);
+                window.history.replaceState({}, '', url.toString());
+            });
+        });
+
+        // Activar pestaña basada en parámetro URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('tab') || 'proyectos';
+        const activeButton = document.getElementById('tab-' + activeTab);
+        const activeContent = document.getElementById('content-' + activeTab);
+
+        if (activeButton && activeContent) {
+            // Limpiar estado actual
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            tabContents.forEach(content => content.classList.add('hidden'));
+
+            // Activar pestaña correcta
+            activeButton.classList.add('active', 'border-blue-500', 'text-blue-600');
+            activeButton.classList.remove('border-transparent', 'text-gray-500');
+            activeContent.classList.remove('hidden');
+        }
+    }
+
+    // Confirm close project with SweetAlert2
+    function confirmCloseProject(projectId) {
+        Swal.fire({
+            title: '¿Cerrar Proyecto?',
+            text: '¿Estás seguro de que deseas cerrar este proyecto? Esta acción no se puede deshacer.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '¡Sí, cerrar!',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Enviar formulario POST para cerrar proyecto
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/empleador/proyectos/' + projectId + '/cerrar';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+
+    // Confirm accept applicant
+    function confirmAcceptApplicant(postulacionId) {
+        Swal.fire({
+            title: '¿Aceptar Postulante?',
+            text: '¿Deseas contratar a este postulante?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '¡Sí, contratar!',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#059669',
+            cancelButtonColor: '#6b7280'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/empleador/postulaciones/' + postulacionId + '/aceptar';
+            }
+        });
+    }
+
+    // Confirm reject applicant
+    function confirmRejectApplicant(postulacionId) {
+        Swal.fire({
+            title: '¿Rechazar Postulante?',
+            text: '¿Estás seguro de que deseas rechazar a este postulante?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '¡Sí, rechazar!',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/empleador/postulaciones/' + postulacionId + '/rechazar';
+            }
+        });
+    }
+
+    // Notification toggle
+    function initNotifications() {
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+
+        notificationBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!notificationDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+                notificationDropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    // NUEVAS FUNCIONES PARA PAGO Y CALIFICACIÓN
+    function confirmarPago(proyectoId) {
+        Swal.fire({
+            title: '¿Confirmar Pago?',
+            text: 'Esta acción simulará el pago del proyecto. ¿Deseas continuar?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, pagar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#2563eb',
+            cancelButtonColor: '#6b7280'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/empleador/proyectos/${proyectoId}/marcar-pagado`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Incluir CSRF token si es necesario
+                        // 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    Swal.fire('¡Pagado!', data, 'success').then(() => {
+                        location.reload(); // Recargar la página para ver los cambios
+                    });
+                })
+                .catch(error => {
+                    Swal.fire('Error', error.message, 'error');
+                });
+            }
+        });
+    }
+
+    function confirmarCalificacion(proyectoId, rolCalificador) {
+        Swal.fire({
+            title: `¿Calificar ${rolCalificador === 'EMPLEADOR' ? 'Freelancer' : 'Empleador'}?`,
+            text: 'Esta acción marcará el proyecto como calificado por ti. ¿Deseas continuar?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, calificar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#6b7280'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/empleador/proyectos/${proyectoId}/calificar-freelancer`, { // Endpoint específico para empleador
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    Swal.fire('¡Calificado!', data, 'success').then(() => {
+                        location.reload(); // Recargar la página para ver los cambios
+                    });
+                })
+                .catch(error => {
+                    Swal.fire('Error', error.message, 'error');
+                });
+            }
+        });
+    }
+
+
+    // DOM loaded init
+    document.addEventListener('DOMContentLoaded', function () {
+        initTabs();
+        initNotifications();
+        document.getElementById('createProjectBtn')?.addEventListener('click', () => toggleCrearProyectoModal(true));
+    });
+</script>
+
+<!-- Modal Detalles Proyecto (dinámico) -->
+<div id="projectModal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-50">
+    <div class="bg-white rounded shadow p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
+        <h2 class="text-lg font-bold mb-4" id="modalTitulo">Detalles del Proyecto</h2>
+        <div id="modalContenido" class="text-sm text-gray-700 space-y-3">
+            <!-- Contenido dinámico cargado por JS -->
+            <p>Cargando datos...</p>
+        </div>
+        <div class="flex justify-end gap-2 mt-4">
+            <button onclick="cerrarModalDetalles()" class="bg-gray-200 px-4 py-1 rounded hover:bg-gray-300 transition">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function abrirModalDetalles(proyectoId) {
+        const modal = document.getElementById('projectModal');
+        const modalTitulo = document.getElementById('modalTitulo');
+        const modalContenido = document.getElementById('modalContenido');
+
+        modalTitulo.textContent = 'Cargando...';
+        modalContenido.innerHTML = '<p>Cargando datos...</p>';
+        modal.classList.remove('hidden');
+
+        fetch(window.location.origin + '/empleador/proyecto/' + proyectoId)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('No se pudo cargar el proyecto');
+                }
+                return response.json();
+            })
+            .then(proyecto => {
+                modalTitulo.textContent = proyecto.titulo;
+
+                let contenidoHtml = `
+                    <p><strong>Descripción:</strong> ${proyecto.descripcion}</p>
+                    <p><strong>Categoría:</strong> ${proyecto.categoriaNombre || 'N/A'}</p>
+                    <p><strong>Modalidad:</strong> ${proyecto.modalidadFormateada || 'N/A'}</p>
+                    <p><strong>Modalidad de Pago:</strong> ${proyecto.modalidadPagoFormateada || 'N/A'}</p>
+                    <p><strong>Ubicación:</strong> ${proyecto.ubicacion || 'N/A'}</p>
+                    <p><strong>Fecha de Inicio:</strong> ${proyecto.fechaInicioFormateada || 'N/A'}</p>
+                    <p><strong>Fecha Final:</strong> ${proyecto.fechaFinalFormateada || 'N/A'}</p>
+                    <p><strong>Presupuesto:</strong> S/.${proyecto.montoPropuesto}</p>
+                `;
+                // Añadir información del freelancer contratado si existe
+                if (proyecto.idFreelancerContratado) {
+                    contenidoHtml += `
+                        <h4 class="font-bold mt-4">Freelancer Contratado:</h4>
+                        <p><strong>Nombre:</strong> ${proyecto.freelancerContratadoNombre || 'N/A'}</p>
+                        <p><strong>Correo:</strong> ${proyecto.freelancerContratadoCorreo || 'N/A'}</p>
+                        <p><strong>Teléfono:</strong> ${proyecto.freelancerContratadoTelefono || 'N/A'}</p>
+                    `;
+                }
+
+
+                modalContenido.innerHTML = contenidoHtml;
+            })
+            .catch(error => {
+                modalTitulo.textContent = 'Error';
+                modalContenido.innerHTML = `<p class="text-red-600">${error.message}</p>`;
+            });
+    }
+
+    function cerrarModalDetalles() {
+        const modal = document.getElementById('projectModal');
+        modal.classList.add('hidden');
+    }
+    </script>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // Funcionalidad para aplicar filtro
+        document.getElementById('aplicarFiltro').addEventListener('click', function() {
+            const categoriaId = document.getElementById('categoriaFilter').value;
+            const url = new URL(window.location.href);
+            if (categoriaId) {
+                url.searchParams.set('categoriaIdPostulaciones', categoriaId);
+            } else {
+                url.searchParams.delete('categoriaIdPostulaciones');
+            }
+            url.searchParams.delete('postulacionesPage'); // resetear página al aplicar filtro
+
+            // Mantener la pestaña activa actual
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab) {
+                const tabId = activeTab.id.replace('tab-', '');
+                url.searchParams.set('tab', tabId);
+            }
+
+            // Forzar mostrar la pestaña activa después de recargar
+            setTimeout(() => {
+                const tabToShow = url.searchParams.get('tab');
+                if (tabToShow) {
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                        btn.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                    const activeBtn = document.getElementById('tab-' + tabToShow);
+                    if (activeBtn) {
+                        activeBtn.classList.add('active', 'border-blue-500', 'text-blue-600');
+                    }
+                    const activeContent = document.getElementById('content-' + tabToShow);
+                    if (activeContent) {
+                        activeContent.classList.remove('hidden');
+                    }
+                }
+            }, 100);
+
+            window.location.href = url.toString();
+        });
+
+        // Funcionalidad para limpiar filtro
+        document.getElementById('limpiarFiltro').addEventListener('click', function() {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('categoriaIdPostulaciones');
+            url.searchParams.delete('postulacionesPage');
+
+            // Mantener la pestaña activa actual
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab) {
+                const tabId = activeTab.id.replace('tab-', '');
+                url.searchParams.set('tab', tabId);
+            }
+
+            // Forzar mostrar la pestaña activa después de recargar
+            setTimeout(() => {
+                const tabToShow = url.searchParams.get('tab');
+                if (tabToShow) {
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                        btn.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                    const activeBtn = document.getElementById('tab-' + tabToShow);
+                    if (activeBtn) {
+                        activeBtn.classList.add('active', 'border-blue-500', 'text-blue-600');
+                    }
+                    const activeContent = document.getElementById('content-' + tabToShow);
+                    if (activeContent) {
+                        activeContent.classList.remove('hidden');
+                    }
+                }
+            }, 100);
+
+            window.location.href = url.toString();
+        });
+
+        // Funcionalidad para aplicar filtro en Mis Proyectos
+        document.getElementById('aplicarFiltroProyectos').addEventListener('click', function() {
+            const categoriaId = document.getElementById('categoriaFilterProyectos').value;
+            const url = new URL(window.location.href);
+            if (categoriaId) {
+                url.searchParams.set('categoriaId', categoriaId);
+            } else {
+                url.searchParams.delete('categoriaId');
+            }
+            url.searchParams.delete('proyectosPage'); // resetear página al aplicar filtro
+
+            // Mantener la pestaña activa actual
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab) {
+                const tabId = activeTab.id.replace('tab-', '');
+                url.searchParams.set('tab', tabId);
+            }
+
+            // Forzar mostrar la pestaña activa después de recargar
+            setTimeout(() => {
+                const tabToShow = url.searchParams.get('tab');
+                if (tabToShow) {
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                        btn.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                    const activeBtn = document.getElementById('tab-' + tabToShow);
+                    if (activeBtn) {
+                        activeBtn.classList.add('active', 'border-blue-500', 'text-blue-600');
+                    }
+                    const activeContent = document.getElementById('content-' + tabToShow);
+                    if (activeContent) {
+                        activeContent.classList.remove('hidden');
+                    }
+                }
+            }, 100);
+
+            window.location.href = url.toString();
+        });
+
+        // Funcionalidad para limpiar filtro en Mis Proyectos
+        document.getElementById('limpiarFiltroProyectos').addEventListener('click', function() {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('categoriaId');
+            url.searchParams.delete('proyectosPage');
+
+            // Mantener la pestaña activa actual
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab) {
+                const tabId = activeTab.id.replace('tab-', '');
+                url.searchParams.set('tab', tabId);
+            }
+
+            // Forzar mostrar la pestaña activa después de recargar
+            setTimeout(() => {
+                const tabToShow = url.searchParams.get('tab');
+                if (tabToShow) {
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                        btn.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                    const activeBtn = document.getElementById('tab-' + tabToShow);
+                    if (activeBtn) {
+                        activeBtn.classList.add('active', 'border-blue-500', 'text-blue-600');
+                    }
+                    const activeContent = document.getElementById('content-' + tabToShow);
+                    if (activeContent) {
+                        activeContent.classList.remove('hidden');
+                    }
+                }
+            }, 100);
+
+            window.location.href = url.toString();
+        });
+    });
+</script>
+
+</body>
+</html>

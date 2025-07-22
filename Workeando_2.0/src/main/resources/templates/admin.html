@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Workeando - Dashboard Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1><i class="fas fa-cogs"></i> Panel de Administración</h1>
+                    <a href="/logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+                </div>
+                
+                <!-- Mostrar error si existe -->
+                <div th:if="${error}" class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> <span th:text="${error}"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestañas de navegación -->
+        <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles" type="button" role="tab">
+                    <i class="fas fa-users-cog"></i> Gestión de Roles
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="categorias-tab" data-bs-toggle="tab" data-bs-target="#categorias" type="button" role="tab">
+                    <i class="fas fa-tags"></i> Gestión de Categorías
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab">
+                    <i class="fas fa-user-shield"></i> Permisos de Usuarios
+                </button>
+            </li>
+        </ul>
+
+        <!-- Contenido de las pestañas -->
+        <div class="tab-content" id="adminTabsContent">
+            
+            <!-- Gestión de Roles -->
+            <div class="tab-pane fade show active" id="roles" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-plus-circle"></i> Crear Nuevo Rol</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="crearRolForm">
+                                    <div class="mb-3">
+                                        <label for="nombreRol" class="form-label">Nombre del Rol</label>
+                                        <input type="text" class="form-control" id="nombreRol" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Crear Rol
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-list"></i> Roles Existentes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="listaRoles">
+                                    <div th:each="rol : ${roles}" class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                                        <span th:text="${rol.nombre}" class="fw-bold"></span>
+                                        <div>
+                                            <button class="btn btn-sm btn-info me-1" onclick="gestionarPermisosRol(this)" 
+                                                    th:data-rol-id="${rol.id}" th:data-rol-nombre="${rol.nombre}">
+                                                <i class="fas fa-key"></i> Permisos
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="eliminarRol(this)" 
+                                                    th:data-rol-id="${rol.id}" th:data-rol-nombre="${rol.nombre}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestión de Categorías -->
+            <div class="tab-pane fade" id="categorias" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-plus-circle"></i> Crear Nueva Categoría</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="crearCategoriaForm">
+                                    <div class="mb-3">
+                                        <label for="nombreCategoria" class="form-label">Nombre de la Categoría</label>
+                                        <input type="text" class="form-control" id="nombreCategoria" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Crear Categoría
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-list"></i> Categorías Existentes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="listaCategorias">
+                                    <div th:each="categoria : ${categorias}" class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                                        <span th:text="${categoria.nombre}" class="fw-bold"></span>
+                                        <div>
+                                            <button class="btn btn-sm btn-warning me-1" onclick="editarCategoria(this)" 
+                                                    th:data-categoria-id="${categoria.id}" th:data-categoria-nombre="${categoria.nombre}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="eliminarCategoria(this)" 
+                                                    th:data-categoria-id="${categoria.id}" th:data-categoria-nombre="${categoria.nombre}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Permisos de Usuarios -->
+            <div class="tab-pane fade" id="usuarios" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-user-shield"></i> Gestión de Permisos por Usuario</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Usuario</th>
+                                                <th>Correo</th>
+                                                <th>Roles</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="usuario : ${usuarios}">
+                                                <td th:text="${usuario.nombre}"></td>
+                                                <td th:text="${usuario.correo}"></td>
+                                                <td>
+                                                    <span th:each="rol : ${usuario.roles}" class="badge bg-secondary me-1" th:text="${rol.nombre}"></span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="gestionarPermisosUsuario(this)" 
+                                                            th:data-usuario-id="${usuario.id}" th:data-usuario-nombre="${usuario.nombre}">
+                                                        <i class="fas fa-key"></i> Gestionar Permisos
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <!-- Modal para gestionar permisos de rol -->
+    <div class="modal fade" id="modalPermisosRol" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gestionar Permisos del Rol</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="permisosRolContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para gestionar permisos de usuario -->
+    <div class="modal fade" id="modalPermisosUsuario" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gestionar Permisos del Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="permisosUsuarioContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar categoría -->
+    <div class="modal fade" id="modalEditarCategoria" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Categoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editarCategoriaForm">
+                        <input type="hidden" id="editCategoriaId">
+                        <div class="mb-3">
+                            <label for="editNombreCategoria" class="form-label">Nombre de la Categoría</label>
+                            <input type="text" class="form-control" id="editNombreCategoria" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variables globales
+        let permisos = [];
+        
+        // Cargar permisos al inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarPermisos();
+        });
+
+        // Cargar lista de permisos
+        async function cargarPermisos() {
+            try {
+                const response = await fetch('/api/admin/roles/permisos');
+                if (response.ok) {
+                    permisos = await response.json();
+                }
+            } catch (error) {
+                console.error('Error al cargar permisos:', error);
+            }
+        }
+
+        // Crear rol
+        document.getElementById('crearRolForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nombreRol').value.trim();
+            
+            try {
+                const response = await fetch('/api/admin/roles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre: nombre })
+                });
+                
+                if (response.ok) {
+                    mostrarAlerta('Rol creado exitosamente', 'success');
+                    document.getElementById('nombreRol').value = '';
+                    location.reload();
+                } else {
+                    const error = await response.text();
+                    mostrarAlerta(error, 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Error al crear rol', 'danger');
+            }
+        });
+
+        // Eliminar rol
+        async function eliminarRol(button) {
+            const rolId = button.dataset.rolId;
+            const rolNombre = button.dataset.rolNombre;
+            
+            if (confirm(`¿Está seguro de eliminar el rol "${rolNombre}"?`)) {
+                try {
+                    const response = await fetch(`/api/admin/roles/${rolId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        mostrarAlerta('Rol eliminado exitosamente', 'success');
+                        location.reload();
+                    } else {
+                        const error = await response.text();
+                        mostrarAlerta(error, 'danger');
+                    }
+                } catch (error) {
+                    mostrarAlerta('Error al eliminar rol', 'danger');
+                }
+            }
+        }
+
+        // Crear categoría
+        document.getElementById('crearCategoriaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nombreCategoria').value.trim();
+            
+            try {
+                const response = await fetch('/api/admin/categorias', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre: nombre })
+                });
+                
+                if (response.ok) {
+                    mostrarAlerta('Categoría creada exitosamente', 'success');
+                    document.getElementById('nombreCategoria').value = '';
+                    location.reload();
+                } else {
+                    const error = await response.text();
+                    mostrarAlerta(error, 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Error al crear categoría', 'danger');
+            }
+        });
+
+        // Editar categoría
+        function editarCategoria(button) {
+            const categoriaId = button.dataset.categoriaId;
+            const categoriaNombre = button.dataset.categoriaNombre;
+            
+            document.getElementById('editCategoriaId').value = categoriaId;
+            document.getElementById('editNombreCategoria').value = categoriaNombre;
+            
+            new bootstrap.Modal(document.getElementById('modalEditarCategoria')).show();
+        }
+
+        // Guardar cambios de categoría
+        document.getElementById('editarCategoriaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const categoriaId = document.getElementById('editCategoriaId').value;
+            const nuevoNombre = document.getElementById('editNombreCategoria').value.trim();
+            
+            try {
+                const response = await fetch(`/api/admin/categorias/${categoriaId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre: nuevoNombre })
+                });
+                
+                if (response.ok) {
+                    mostrarAlerta('Categoría actualizada exitosamente', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('modalEditarCategoria')).hide();
+                    location.reload();
+                } else {
+                    const error = await response.text();
+                    mostrarAlerta(error, 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Error al actualizar categoría', 'danger');
+            }
+        });
+
+        // Eliminar categoría
+        async function eliminarCategoria(button) {
+            const categoriaId = button.dataset.categoriaId;
+            const categoriaNombre = button.dataset.categoriaNombre;
+            
+            if (confirm(`¿Está seguro de eliminar la categoría "${categoriaNombre}"?`)) {
+                try {
+                    const response = await fetch(`/api/admin/categorias/${categoriaId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        mostrarAlerta('Categoría eliminada exitosamente', 'success');
+                        location.reload();
+                    } else {
+                        const error = await response.text();
+                        mostrarAlerta(error, 'danger');
+                    }
+                } catch (error) {
+                    mostrarAlerta('Error al eliminar categoría', 'danger');
+                }
+            }
+        }
+
+        // Gestionar permisos de rol
+        function gestionarPermisosRol(button) {
+            const rolId = button.dataset.rolId;
+            const rolNombre = button.dataset.rolNombre;
+            
+            document.querySelector('#modalPermisosRol .modal-title').textContent = `Permisos del Rol: ${rolNombre}`;
+            
+            let content = '<p>Funcionalidad de gestión de permisos de rol en desarrollo...</p>';
+            content += `<p>Rol ID: ${rolId}</p>`;
+            
+            document.getElementById('permisosRolContent').innerHTML = content;
+            new bootstrap.Modal(document.getElementById('modalPermisosRol')).show();
+        }
+
+        // Gestionar permisos de usuario
+async function gestionarPermisosUsuario(button) {
+    const usuarioId = button.dataset.usuarioId;
+    const usuarioNombre = button.dataset.usuarioNombre;
+
+    document.querySelector('#modalPermisosUsuario .modal-title').textContent = `Permisos del Usuario: ${usuarioNombre}`;
+
+    try {
+        const permisosUsuarioResponse = await fetch(`/api/admin/usuarios/${usuarioId}/permisos`);
+        const permisosUsuario = permisosUsuarioResponse.ok ? await permisosUsuarioResponse.json() : [];
+
+        console.log("Permisos recibidos del backend:", permisosUsuario);
+
+        let content = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Permisos Disponibles</h6>
+                    <div class="border p-3" style="max-height: 400px; overflow-y: auto;">
+        `;
+
+        permisos.forEach(permiso => {
+            const tienePermiso = permisosUsuario.some(p => p.id === permiso.id);
+            if (!tienePermiso) {
+                content += `
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                        <div>
+                            <strong>${permiso.nombre}</strong>
+                            <br><small class="text-muted">${permiso.descripcion || 'Sin descripción'}</small>
+                        </div>
+                        <button class="btn btn-sm btn-success" onclick="asignarPermisoAUsuario(${usuarioId}, ${permiso.id}, '${permiso.nombre}')">
+                            <i class="fas fa-plus"></i> Asignar
+                        </button>
+                    </div>
+                `;
+            }
+        });
+
+        content += `
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>Permisos Asignados</h6>
+                    <div class="border p-3" style="max-height: 400px; overflow-y: auto;" id="permisosAsignados">
+        `;
+
+        permisosUsuario.forEach(permiso => {
+            const heredado = permiso.heredado;
+
+            const boton = heredado
+                ? `<button class="btn btn-sm btn-outline-secondary" disabled>
+                        <i class="fas fa-lock"></i> Heredado
+                   </button>`
+                : `<button class="btn btn-sm btn-danger" onclick="revocarPermisoDeUsuario(${usuarioId}, ${permiso.id}, '${permiso.nombre}')">
+                        <i class="fas fa-minus"></i> Revocar
+                   </button>`;
+
+            const etiquetaHeredado = heredado ? `<span class="badge bg-secondary ms-2">Heredado</span>` : '';
+
+            content += `
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded bg-light" id="permiso-${permiso.id}">
+                    <div>
+                        <strong>${permiso.nombre}</strong> ${etiquetaHeredado}
+                        <br><small class="text-muted">${permiso.descripcion || 'Sin descripción'}</small>
+                    </div>
+                    ${boton}
+                </div>
+            `;
+        });
+
+        content += `
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('permisosUsuarioContent').innerHTML = content;
+        new bootstrap.Modal(document.getElementById('modalPermisosUsuario')).show();
+
+    } catch (error) {
+        console.error('Error al cargar permisos del usuario:', error);
+        document.getElementById('permisosUsuarioContent').innerHTML = '<p class="text-danger">Error al cargar los permisos del usuario.</p>';
+        new bootstrap.Modal(document.getElementById('modalPermisosUsuario')).show();
+    }
+}
+
+        // Asignar permiso a usuario
+        async function asignarPermisoAUsuario(usuarioId, permisoId, permisoNombre) {
+            try {
+                const response = await fetch(`/api/admin/usuarios/${usuarioId}/permisos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ permisoId: permisoId })
+                });
+                
+                if (response.ok) {
+                    mostrarAlerta(`Permiso "${permisoNombre}" asignado exitosamente`, 'success');
+                    // Actualizar el modal dinámicamente
+                    await actualizarModalPermisos(usuarioId);
+                } else {
+                    const error = await response.text();
+                    mostrarAlerta(error, 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Error al asignar permiso', 'danger');
+            }
+        }
+
+        // Revocar permiso de usuario
+        async function revocarPermisoDeUsuario(usuarioId, permisoId, permisoNombre) {
+            if (confirm(`¿Está seguro de revocar el permiso "${permisoNombre}"?`)) {
+                try {
+                    const response = await fetch(`/api/admin/usuarios/${usuarioId}/permisos/${permisoId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        mostrarAlerta(`Permiso "${permisoNombre}" revocado exitosamente`, 'success');
+                        // Actualizar el modal dinámicamente
+                        await actualizarModalPermisos(usuarioId);
+                    } else {
+                        const error = await response.text();
+                        mostrarAlerta(error, 'danger');
+                    }
+                } catch (error) {
+                    mostrarAlerta('Error al revocar permiso', 'danger');
+                }
+            }
+        }
+
+// Función para actualizar el contenido del modal sin cerrarlo
+async function actualizarModalPermisos(usuarioId) {
+    try {
+        const permisosUsuarioResponse = await fetch(`/api/admin/usuarios/${usuarioId}/permisos`);
+        const permisosUsuario = permisosUsuarioResponse.ok ? await permisosUsuarioResponse.json() : [];
+
+        // Actualizar sección de permisos disponibles
+        const permisosDisponiblesContainer = document.querySelector('#modalPermisosUsuario .col-md-6:first-child .border');
+        let permisosDisponiblesContent = '';
+
+        permisos.forEach(permiso => {
+            const tienePermiso = permisosUsuario.some(p => p.id === permiso.id);
+            if (!tienePermiso) {
+                permisosDisponiblesContent += `
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                        <div>
+                            <strong>${permiso.nombre}</strong>
+                            <br><small class="text-muted">${permiso.descripcion || 'Sin descripción'}</small>
+                        </div>
+                        <button class="btn btn-sm btn-success" onclick="asignarPermisoAUsuario(${usuarioId}, ${permiso.id}, '${permiso.nombre}')">
+                            <i class="fas fa-plus"></i> Asignar
+                        </button>
+                    </div>
+                `;
+            }
+        });
+
+        if (permisosDisponiblesContent === '') {
+            permisosDisponiblesContent = '<p class="text-muted">No hay permisos disponibles para asignar</p>';
+        }
+
+        permisosDisponiblesContainer.innerHTML = permisosDisponiblesContent;
+
+        // Actualizar sección de permisos asignados
+        const permisosAsignados = document.getElementById('permisosAsignados');
+        let permisosAsignadosContent = '';
+
+        permisosUsuario.forEach(permiso => {
+            const heredado = permiso.heredado;
+
+            const boton = heredado
+                ? `<button class="btn btn-sm btn-outline-secondary" disabled>
+                        <i class="fas fa-lock"></i> Heredado
+                   </button>`
+                : `<button class="btn btn-sm btn-danger" onclick="revocarPermisoDeUsuario(${usuarioId}, ${permiso.id}, '${permiso.nombre}')">
+                        <i class="fas fa-minus"></i> Revocar
+                   </button>`;
+
+            const etiquetaHeredado = heredado ? `<span class="badge bg-secondary ms-2">Heredado</span>` : '';
+
+            permisosAsignadosContent += `
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded bg-light" id="permiso-${permiso.id}">
+                    <div>
+                        <strong>${permiso.nombre}</strong> ${etiquetaHeredado}
+                        <br><small class="text-muted">${permiso.descripcion || 'Sin descripción'}</small>
+                    </div>
+                    ${boton}
+                </div>
+            `;
+        });
+
+        if (permisosAsignadosContent === '') {
+            permisosAsignadosContent = '<p class="text-muted">No hay permisos asignados</p>';
+        }
+
+        permisosAsignados.innerHTML = permisosAsignadosContent;
+
+    } catch (error) {
+        console.error('Error al actualizar modal de permisos:', error);
+        mostrarAlerta('Error al actualizar la vista de permisos', 'warning');
+    }
+}
+
+        // Mostrar alertas
+        function mostrarAlerta(mensaje, tipo) {
+            const alertaDiv = document.createElement('div');
+            alertaDiv.className = `alert alert-${tipo} alert-dismissible fade show`;
+            alertaDiv.innerHTML = `
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.querySelector('.container-fluid').insertBefore(alertaDiv, document.querySelector('.row'));
+            
+            setTimeout(() => {
+                alertaDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

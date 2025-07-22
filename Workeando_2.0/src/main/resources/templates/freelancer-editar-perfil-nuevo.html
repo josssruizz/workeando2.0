@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil Freelancer | Workeando</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        .skill-tag {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="profile-header text-white py-8 px-4">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row items-center">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/71b07c00-0ee4-46c9-afb5-0eb28ff50287.png" alt="Foto de perfil" class="rounded-full w-32 h-32 border-4 border-white mb-4 md:mb-0 md:mr-6">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2" th:text="${usuario.nombre}">John Doe</h1>
+                    <p class="text-blue-100 mb-2"><i class="fas fa-envelope mr-2"></i><span th:text="${usuario.correo}">john.doe@ejemplo.com</span></p>
+                    <div class="mb-2">
+                        <label for="telefono" class="text-blue-100 block mb-1"><i class="fas fa-phone mr-2"></i>Celular</label>
+                        <input type="tel" id="telefono" name="telefono" th:value="${perfil.telefono ?: ''}" class="w-full p-2 rounded bg-white bg-opacity-20 border border-white border-opacity-30 text-white">
+                    </div>
+                    <div class="mb-4">
+                        <label for="portafolio" class="text-blue-100 block mb-1"><i class="fas fa-link mr-2"></i>Portafolio (URL)</label>
+                        <input type="url" id="portafolio" name="portafolio" th:value="${perfil.portafolio ?: ''}" class="w-full p-2 rounded bg-white bg-opacity-20 border border-white border-opacity-30 text-white">
+                    </div>
+                    <div class="mb-4">
+                        <label for="habilidadesPersonalizadas" class="text-blue-100 block mb-2">Habilidades (separadas por coma)</label>
+                        <input type="text" id="habilidadesPersonalizadas" name="habilidadesPersonalizadas" th:value="${habilidadesPersonalizadas ?: ''}" placeholder="Ej: Java, Spring Boot, SQL" class="w-full p-2 rounded bg-white bg-opacity-20 border border-white border-opacity-30 text-white">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto py-8 px-4">
+            <section class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800"><i class="fas fa-user mr-2 text-blue-500"></i>Sobre mí</h2>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-700 mb-2">Acerca de mí</h3>
+                    <textarea id="acercaDeMi" name="acercaDeMi" rows="5" th:text="${acercaDeMi ?: ''}" class="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+            </section>
+
+            <div class="flex justify-end gap-4 mt-6">
+                <a th:href="@{/freelancer/perfil}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">Cancelar</a>
+                <button type="submit" form="updateProfileForm" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Guardar cambios</button>
+            </div>
+        </main>
+
+        <form id="updateProfileForm" th:action="@{/freelancer/perfil/actualizar}" method="post" class="hidden">
+            <input type="hidden" name="telefono" th:value="${perfil.telefono ?: ''}">
+            <input type="hidden" name="habilidadesPersonalizadas" th:value="${habilidadesPersonalizadas ?: ''}">
+            <input type="hidden" name="portafolio" th:value="${perfil.portafolio ?: ''}">
+            <input type="hidden" name="acercaDeMi" th:value="${acercaDeMi ?: ''}">
+            <!-- El campo experienciaPersonalizada se elimina del formulario -->
+        </form>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('updateProfileForm');
+                const telefonoInput = document.getElementById('telefono');
+                const habilidadesInput = document.getElementById('habilidadesPersonalizadas');
+                const portafolioInput = document.getElementById('portafolio');
+                const acercaDeMiInput = document.getElementById('acercaDeMi');
+
+                // Actualizar los campos ocultos del formulario al cambiar los inputs visibles
+                telefonoInput.addEventListener('input', () => form.telefono.value = telefonoInput.value);
+                habilidadesInput.addEventListener('input', () => form.habilidadesPersonalizadas.value = habilidadesInput.value);
+                portafolioInput.addEventListener('input', () => form.portafolio.value = portafolioInput.value);
+                acercaDeMiInput.addEventListener('input', () => form.acercaDeMi.value = acercaDeMiInput.value);
+            });
+        </script>
+    </body>
+</html>

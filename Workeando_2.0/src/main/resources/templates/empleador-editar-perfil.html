@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar Perfil Empleador - Workeando</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Flowbite -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+  <!-- AOS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-white shadow fixed w-full top-0 z-50 animate__animated animate__fadeInDown">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+      <h1 class="text-2xl font-bold text-blue-600">Workeando</h1>
+      <div class="flex items-center space-x-4">
+        <a th:href="@{'/perfil/empleador/' + ${perfil.usuarioId}}" class="text-blue-600 hover:underline flex items-center gap-1">
+          <i data-lucide="arrow-left" class="w-5 h-5"></i> Volver al Perfil
+        </a>
+        <form action="/logout" method="post">
+          <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Cerrar sesión</button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto mt-24 p-6 bg-white rounded-lg shadow-lg animate__animated animate__fadeIn" data-aos="fade-up">
+    <h2 class="text-3xl font-semibold mb-6 text-center text-blue-700">✏️ Editar Perfil Empleador</h2>
+    <p class="text-center text-gray-600 mb-8">Actualiza tu información para que los freelancers te conozcan mejor.</p>
+
+    <form th:action="@{'/perfil/empleador/' + ${perfil.usuarioId} + '/actualizar'}" method="post" class="space-y-8" id="editProfileForm">
+      <!-- Información básica -->
+      <section>
+        <h3 class="text-xl font-semibold mb-4 border-b border-gray-200 pb-2">📋 Información Básica</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="tipoEmpleador" class="block mb-2 font-medium">Tipo de Empleador</label>
+            <input type="text" id="tipoEmpleador" name="tipoEmpleador" th:value="${perfil.tipoEmpleador}"
+                   class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label for="nombrePublico" class="block mb-2 font-medium">Nombre Público</label>
+            <input type="text" id="nombrePublico" name="nombrePublico" th:value="${perfil.nombrePublico}"
+                   class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Descripción -->
+      <section>
+        <h3 class="text-xl font-semibold mb-4 border-b border-gray-200 pb-2">Descripción</h3>
+        <textarea id="descripcion" name="descripcion" rows="4"
+                  class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  th:text="${perfil.descripcion}"></textarea>
+      </section>
+
+      <!-- Acerca de Nosotros -->
+      <section>
+        <h3 class="text-xl font-semibold mb-4 border-b border-gray-200 pb-2">Acerca de Nosotros</h3>
+        <textarea id="acercaDeNosotros" name="acercaDeNosotros" rows="4"
+                  class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  th:text="${perfil.acercaDeNosotros}"></textarea>
+      </section>
+
+      <!-- Botones -->
+      <div class="flex justify-end gap-4 pt-6 border-t border-gray-200">
+        <a th:href="@{'/perfil/empleador/' + ${perfil.usuarioId}}" class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-100 transition">Cancelar</a>
+        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">💾 Guardar Cambios</button>
+      </div>
+    </form>
+  </main>
+
+  <script th:inline="javascript">
+    lucide.createIcons();
+    AOS.init();
+
+    // Confirmación con SweetAlert2
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('editProfileForm');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        Swal.fire({
+          title: '¿Guardar cambios?',
+          text: "Confirma que deseas actualizar tu perfil.",
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, guardar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            form.submit();
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

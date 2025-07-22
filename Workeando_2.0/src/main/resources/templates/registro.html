@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro - Workeando</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 (Opcional, si se desea usar para notificaciones) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Animate.css -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+
+    <!-- AOS.js -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <style>
+      /* Estilos personalizados basados en empleador.html y la landing page */
+      .btn-primary {
+        background-color: #2563eb; /* blue-600 */
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.3s ease;
+      }
+      .btn-primary:hover {
+        background-color: #1d4ed8; /* blue-700 */
+      }
+      .form-control {
+        border: 1px solid #d1d5db; /* gray-300 */
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.25rem;
+        width: 100%;
+      }
+      .form-control:focus {
+        outline: none;
+        border-color: #2563eb; /* blue-600 */
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); /* blue-600 with opacity */
+      }
+      .alert-danger {
+        background-color: #fee2e2; /* red-100 */
+        color: #991b1b; /* red-800 */
+        padding: 0.75rem 1rem;
+        border-radius: 0.25rem;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header (Similar al de la landing page, pero simplificado para registro) -->
+    <header
+      class="bg-white shadow-lg fixed w-full top-0 z-50 animate__animated animate__fadeInDown"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo -->
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <h1 class="text-2xl font-bold text-blue-600">Workeando</h1>
+            </div>
+          </div>
+          <!-- Botón para volver al inicio de sesión -->
+          <div class="flex items-center space-x-4">
+            <a
+              href="/login"
+              class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              <i data-lucide="log-in" class="w-4 h-4"></i>
+              <span>Iniciar Sesión</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content - Registration Form -->
+    <main class="flex-grow pt-16 flex items-center justify-center bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div class="w-full max-w-md mx-auto p-8 bg-white rounded-lg shadow-xl animate__animated animate__fadeInUp" data-aos="fade-up">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Regístrate en Workeando</h2>
+        <p class="text-gray-600 text-center mb-8">Crea tu cuenta para empezar a conectar con proyectos o talento.</p>
+
+        <!-- Mostrar mensaje de error -->
+        <div th:if="${error}" class="alert-danger" role="alert">
+          <i data-lucide="alert-triangle" class="inline-block w-5 h-5 mr-2"></i>
+          <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/registro}" method="post" th:object="${registroRequestDTO}" class="space-y-5">
+          <div>
+            <label for="nombre" class="block text-gray-700 text-sm font-medium mb-2">Nombre completo</label>
+            <input
+              type="text"
+              id="nombre"
+              th:field="*{nombre}"
+              required
+              class="form-control"
+              placeholder="Tu nombre"
+            />
+          </div>
+
+          <div>
+            <label for="correo" class="block text-gray-700 text-sm font-medium mb-2">Correo electrónico</label>
+            <input
+              type="email"
+              id="correo"
+              th:field="*{correo}"
+              required
+              class="form-control"
+              placeholder="tu@ejemplo.com"
+            />
+          </div>
+
+          <div>
+            <label for="contrasena" class="block text-gray-700 text-sm font-medium mb-2">Contraseña</label>
+            <input
+              type="password"
+              id="contrasena"
+              th:field="*{contrasena}"
+              required
+              class="form-control"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <div>
+            <label for="rol" class="block text-gray-700 text-sm font-medium mb-2">Selecciona tu rol</label>
+            <select th:field="*{rol}" required class="form-control">
+              <option value="">-- Selecciona un rol --</option>
+              <option value="FREELANCER">Freelancer</option>
+              <option value="EMPLEADOR">Empleador</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-primary w-full flex items-center justify-center space-x-2">
+            <i data-lucide="user-plus" class="w-5 h-5"></i>
+            <span>Crear Cuenta</span>
+          </button>
+        </form>
+
+        <div class="mt-6 text-center text-gray-600">
+          ¿Ya tienes una cuenta?
+          <a href="/login" class="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            >Inicia sesión aquí</a
+          >
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer (Similar al de la landing page) -->
+    <footer class="bg-gray-900 text-white" data-aos="fade-up">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <!-- About -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Acerca de Workeando</h3>
+            <p class="text-gray-400 text-sm">
+              La plataforma líder en freelancing que conecta talento con
+              oportunidades.
+            </p>
+          </div>
+          <!-- Links -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Enlaces</h3>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >Inicio</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >Publicar Proyecto</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >Términos y Condiciones</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-white transition-colors"
+                  >Soporte</a
+                >
+              </li>
+            </ul>
+          </div>
+          <!-- Contact -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Contacto</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+                <span class="text-gray-400">contacto@workeando.com</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <i data-lucide="phone" class="w-4 h-4"></i>
+                <span class="text-gray-400">+1 (555) 123-4567</span>
+              </div>
+            </div>
+          </div>
+          <!-- Social Media -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Síguenos</h3>
+            <div class="flex space-x-4">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors"
+              >
+                <i data-lucide="facebook" class="w-5 h-5"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors"
+              >
+                <i data-lucide="twitter" class="w-5 h-5"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors"
+              >
+                <i data-lucide="linkedin" class="w-5 h-5"></i>
+              </a>
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors"
+              >
+                <i data-lucide="instagram" class="w-5 h-5"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+          <p class="text-gray-400 text-sm">
+            &copy; 2024 Workeando. Todos los derechos reservados.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Script -->
+    <script>
+      // Inicializa Lucide y AOS
+      lucide.createIcons();
+      AOS.init({ duration: 800, once: true });
+    </script>
+  </body>
+</html>
+
