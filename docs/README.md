@@ -35,7 +35,7 @@ Proyecto de demostración en Spring Boot como parte de la plataforma Workeando 2
 1. Clona el repositorio:
 
    ```bash
-   git clone <url-de-tu-repo>
+   git clone <https://github.com/josssruizz/workeando2.0.git>
    cd Workeando_2.0/Workeando_2.0
    ```
 2. Asegúrate de que PostgreSQL esté en funcionamiento y crea dos bases de datos:
